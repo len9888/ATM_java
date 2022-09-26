@@ -1,4 +1,9 @@
-public class Account implements Transactions {
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public abstract class Account implements Transactions {
 
 
     private final int accountNumber;
@@ -33,6 +38,7 @@ public class Account implements Transactions {
     public boolean withdraw(double debitAmt) {
         if(balance>debitAmt){
             balance -= debitAmt;
+            Transactions.recordTransaction(debitAmt,"Debit");
             System.out.println("Withdraw successful.");
             return true;
         }
@@ -45,6 +51,7 @@ public class Account implements Transactions {
     @Override
     public boolean deposit(double creditAmt) {
         balance += creditAmt;
+        Transactions.recordTransaction(creditAmt,"Credit");
         System.out.println("Deposit successful.");
         return true;
     }
@@ -52,5 +59,23 @@ public class Account implements Transactions {
     @Override
     public double getBalance() {
         return balance;
+    }
+
+    public boolean printTransactions(){
+        StringBuilder content = new StringBuilder();
+
+        try(BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))){
+            String currentLine;
+            while((currentLine = reader.readLine())!= null){
+                content.append(currentLine).append("\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(content);
+        return true;
     }
 }
